@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    .app {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .todo-list {
+      margin-bottom: 20px;
+    }
+
+    .todo {
+      background: #e9ecef;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .add-todo-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .add-todo-form input {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .add-todo-form button {
+      padding: 10px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .add-todo-form button:hover {
+      background-color: #0056b3;
+    }
+
+    .filter-sort-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .filter-sort-controls input {
+      padding: 5px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .filter-sort-controls select {
+      padding: 5px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const Todo = ({ username, title }) => {
+      return (
+        <div className="todo">
+          <strong>{username}</strong>: {title}
+        </div>
+      );
+    };
+
+    const TodoList = ({ todos }) => {
+      return (
+        <div className="todo-list">
+          <h3>Todos:</h3>
+          {todos.map((todo, index) => (
+            <Todo key={index} username={todo.username} title={todo.title} />
+          ))}
+        </div>
+      );
+    };
+
+    const AddTodoForm = ({ onAddTodo }) => {
+      const [username, setUsername] = useState("");
+      const [title, setTitle] = useState("");
+
+      const handleAddTodo = (e) => {
+        e.preventDefault();
+        if (username.trim() && title.trim()) {
+          onAddTodo({ username, title });
+          setUsername("");
+          setTitle("");
+        } else {
+          alert("Both fields are required!");
+        }
+      };
+
+      return (
+        <form className="add-todo-form" onSubmit={handleAddTodo}>
+          <input
+            type="text"
+            placeholder="Enter username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Enter todo title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <button type="submit">Add Todo</button>
+        </form>
+      );
+    };
+
+    const FilterSortControls = ({ filter, onFilterChange, sort, onSortChange }) => {
+      return (
+        <div className="filter-sort-controls">
+          <input
+            type="text"
+            placeholder="Filter by username"
+            value={filter}
+            onChange={(e) => onFilterChange(e.target.value)}
+          />
+          <select value={sort} onChange={(e) => onSortChange(e.target.value)}>
+            <option value="default">Sort by</option>
+            <option value="username">Username (A-Z)</option>
+            <option value="title">Title (A-Z)</option>
+          </select>
+        </div>
+      );
+    };
+
+    const App = () => {
+      const [todos, setTodos] = useState([
+        { username: "Ali", title: "Frontend development" },
+        { username: "Maggie", title: "Backend development" },
+        { username: "Ryan", title: "Complete React project" },
+      ]);
+      const [filter, setFilter] = useState("");
+      const [sort, setSort] = useState("default");
+
+      const handleAddTodo = (newTodo) => {
+        setTodos((prevTodos) => [...prevTodos, newTodo]);
+      };
+
+      const filteredTodos = todos.filter((todo) =>
+        todo.username.toLowerCase().includes(filter.toLowerCase())
+      );
+
+      const sortedTodos = [...filteredTodos].sort((a, b) => {
+        if (sort === "username") {
+          return a.username.localeCompare(b.username);
+        } else if (sort === "title") {
+          return a.title.localeCompare(b.title);
+        }
+        return 0;
+      });
+
+      return (
+        <div className="app">
+          <h1>Todo App</h1>
+          <FilterSortControls
+            filter={filter}
+            onFilterChange={setFilter}
+            sort={sort}
+            onSortChange={setSort}
+          />
+          <TodoList todos={sortedTodos} />
+          <AddTodoForm onAddTodo={handleAddTodo} />
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</body>
+</html>
