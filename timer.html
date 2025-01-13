@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f8ff;
+      color: #333;
+    }
+
+    .app {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .countdown {
+      margin-bottom: 20px;
+    }
+
+    .countdown-time {
+      font-size: 24px;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        color: #007bff;
+      }
+      50% {
+        color: #0056b3;
+      }
+      100% {
+        color: #007bff;
+      }
+    }
+
+    .timer-input {
+      width: 60px;
+      padding: 5px;
+      margin-right: 10px;
+    }
+
+    .reset-button {
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .reset-button:hover {
+      background-color: #0056b3;
+    }
+
+    .user-list ul {
+      padding: 0;
+      list-style: none;
+    }
+
+    .user-list li {
+      background: #e9ecef;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .add-user {
+      margin-top: 10px;
+    }
+
+    .add-user input {
+      padding: 5px;
+      margin-right: 10px;
+    }
+
+    .add-button,
+    .remove-button {
+      padding: 5px 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .add-button:hover {
+      background-color: #218838;
+    }
+
+    .remove-button {
+      background-color: #dc3545;
+    }
+
+    .remove-button:hover {
+      background-color: #c82333;
+    }
+
+    .random-number {
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #e0f7fa;
+      border: 1px solid #00acc1;
+      border-radius: 4px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .even {
+      color: green;
+    }
+
+    .odd {
+      color: red;
+    }
+
+    .log-button {
+      padding: 10px 15px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .log-button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const CountdownTimer = () => {
+      const [timeLeft, setTimeLeft] = useState(10);
+      const [inputTime, setInputTime] = useState(10);
+
+      useEffect(() => {
+        const timer = setInterval(() => {
+          setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+        }, 1000);
+
+        return () => clearInterval(timer);
+      }, [timeLeft]);
+
+      const handleReset = () => setTimeLeft(inputTime);
+      const handleInputChange = (e) => setInputTime(Number(e.target.value));
+
+      return (
+        <div className="countdown">
+          <p className="countdown-time">{timeLeft} seconds</p>
+          <input
+            type="number"
+            value={inputTime}
+            onChange={handleInputChange}
+            min="1"
+            className="timer-input"
+          />
+          <button onClick={handleReset} className="reset-button">
+            Reset Timer
+          </button>
+        </div>
+      );
+    };
+
+    const UserList = () => {
+      const [users, setUsers] = useState([
+        { id: 1, name: "Tanner" },
+        { id: 2, name: "Maggie" },
+        { id: 3, name: "Ryan" },
+        { id: 4, name: "Ali" },
+        { id: 5, name: "GBugz" },
+      ]);
+      const [newUser, setNewUser] = useState("");
+
+      const handleAddUser = () => {
+        if (newUser.trim()) {
+          setUsers([...users, { id: users.length + 1, name: newUser }]);
+          setNewUser("");
+        }
+      };
+
+      const handleRemoveUser = (id) => {
+        setUsers(users.filter((user) => user.id !== id));
+      };
+
+      return (
+        <div className="user-list">
+          <h3>User List:</h3>
+          <ul>
+            {users.map((user) => (
+              <li key={user.id}>
+                {user.id}. {user.name}
+                <button
+                  onClick={() => handleRemoveUser(user.id)}
+                  className="remove-button"
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="add-user">
+            <input
+              type="text"
+              value={newUser}
+              onChange={(e) => setNewUser(e.target.value)}
+              placeholder="Enter new user"
+            />
+            <button onClick={handleAddUser} className="add-button">
+              Add User
+            </button>
+          </div>
+        </div>
+      );
+    };
+
+    const RandomNumber = () => {
+      const randomNumber = Math.floor(Math.random() * 10) + 1;
+      const isEven = randomNumber % 2 === 0;
+
+      return (
+        <div className={`random-number ${isEven ? "even" : "odd"}`}>
+          <p>Random Number: {randomNumber}</p>
+          <p>{isEven ? "Number is even" : "Number is odd"}</p>
+        </div>
+      );
+    };
+
+    const LogButton = () => {
+      const handleClick = () => console.log("Button was clicked!");
+      return (
+        <button className="log-button" onClick={handleClick}>
+          Click Me!
+        </button>
+      );
+    };
+
+    const App = () => {
+      return (
+        <div className="app">
+          <h1>React App</h1>
+          <CountdownTimer />
+          <UserList />
+          <div className="random-numbers">
+            <h3>Random Numbers:</h3>
+            <RandomNumber />
+            <RandomNumber />
+            <RandomNumber />
+            <RandomNumber />
+            <RandomNumber />
+          </div>
+          <LogButton />
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</body>
+</html>
